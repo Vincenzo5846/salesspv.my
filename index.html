@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="theme-color" content="#524bbf">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sales Percent Visitor</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="style.css">
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 5px;
+            text-align: center;
+            background-image: linear-gradient(to right, blue, white);
+        }
+        input, button{
+            width: 40%;
+            padding: 5px;
+            margin: 0px, 0;
+            font-size: 15px;
+        }
+        button {
+            background-color: #65e0ca;
+            color: darksalmon;
+            border: none;
+        }
+        #result {
+            margin-top: 10px;
+            font-size: 15px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h2>📊 คิดเปอร์เซ็นยอดขาย</h2>
+
+    <input type="number" id="total" placeholder="ยอดขายทั้งหมด">
+    <input type="number" id="sold" placeholder="ยอดขายที่ได้">
+
+    <button onclick="calculate()">คำนวณ</button>
+    <button onclick="saveData()">บันทึกข้อมูล</button>
+
+    <div id="result"></div>
+
+    <h2>🎯 ติดตามเป้ายอดขาย</h2>
+
+    <input type="number" id="target" placeholder="เป้ายอดขาย/วัน">
+    <input type="number" id="today" placeholder="ยอดขายวันนี้">
+
+    <button onclick="calculate()">คำนวณ</button>
+    <button onclick="saveData()">บันทึกข้อมูล</button>
+
+    <div id="result"></div>
+    <hr>
+    <h3>📅 ประวัติรายวัน</h3>
+    <ul id="history"></ul>
+
+    <script>
+        function calculate() {
+            const total = document.getElementById("total").value;
+            const sold = document.getElementById("sold").value;
+
+            if (total <= 0 || sold < 0) {
+                document.getElementById("result").innerText =
+                    "กรุณากรอกข้อมูลให้ถูกต้อง";
+                return;
+            }
+
+            const percent = (sold / total) * 100;
+            document.getElementById("result").innerText =
+                `คิดเป็น ${percent.toFixed(2)} %`;
+        
+        }
+        function saveData() {
+            const target = document.getElementById("target").value;
+            const today = document.getElementById("today").value;
+            const date = new Date().toLocaleDateString("th-TH");
+
+            if (!target || !today) return;
+
+             const record = {
+                 date,
+                 target,
+                 today
+            };
+
+            let history = JSON.parse(localStorage.getItem("salesHistory")) || [];
+            history.push(record);
+
+            localStorage.setItem("salesHistory", JSON.stringify(history));
+            showHistory();
+        }
+        function showHistory() {
+            const history = JSON.parse(localStorage.getItem("salesHistory")) || [];
+            const list = document.getElementById("history");
+            list.innerHTML = "";
+
+            history.forEach(item => {
+                 const percent = (item.today / item.target) * 100;
+                 const li = document.createElement("li");
+                 li.textContent =
+                        `${item.date} | ${item.today}/${item.target} (${percent.toFixed(1)}%)`;
+                 list.appendChild(li);
+            });
+        }
+        showHistory();
+    </script>
+
+</body>
+</html>
